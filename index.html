@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ShowUsers</title>
+    <link
+      rel="stylesheet"
+      href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css"
+      integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="bootstrap-4.6.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="loading hide">
+      <div></div>
+    </div>
+    
+    <div class="container-fluid row p-5">
+      <p class="h3 col-md8">Enter the UserId and see the UserId information : </p>
+      <input onchange="action(this.value)" type="text" placeholder="Enter" class=" ml-5 col-md-3" id="input" >
+      <p class=" p-3 col-md-12">You must enter a number between 1 and 10 and also do not leave blank, otherwise an error message will be issued.</p>
+    </div>
+    <div id="screen" class="screen p-3">
+    </div>
+    <script>
+      const showLoading = function () {
+        document.querySelector(".loading").classList.remove("hide");
+      };
+      const hideLoading = function () {
+        document.querySelector(".loading").classList.add("hide");
+      };
+      action = function(id){
+        
+        showInfo(id);
+        ShowpostUser(id);
+        ShowUseralbums (id);
+        ShowtodosUser(id);
+             }
+     
+       
+      function showInfo(id) {
+       
+       showLoading();
+        if ( document.getElementById("input").value==' ') {
+           
+           document.getElementById("screen").innerHTML = `<h3>Enter Id</h3>`;
+        
+          hideLoading();
+          return;
+        }
+          else if (isNaN(id)) {
+           document.getElementById("screen").innerHTML = `<h3>Invalid Id</h3>`;
+           hideLoading();
+           
+         } else if (id<0 || id > 10) {
+           document.getElementById("screen").innerHTML = `<h3>Id between 1 and 10</h3>`;
+           hideLoading();
+         };
+       
+       
+       
+        const xhttp = new XMLHttpRequest();
+       
+        xhttp.open(
+          "GET",
+          "https://jsonplaceholder.typicode.com/users/" + id,
+          true
+        );
+       
+      
+        xhttp.onreadystatechange = function () {
+         
+          if (this.readyState === 4 && this.status === 200) {
+            var Userinfo = [];
+            Userinfo = JSON.parse(xhttp.responseText); 
+            hideLoading();
+
+            document.getElementById("screen").innerHTML="";
+            document.getElementById("screen").innerHTML += `<div class="container-fluid">
+              <h3>The user <strong style="color:red" > ${Userinfo.id}</strong> information: </h3>
+              <div class="table-responsive">
+              
+              <table class="table  table-bordered table-striped table-dark">
+  <thead>
+    <tr>
+      <th scope="col">id</th>
+      <th scope="col">name</th>
+      <th scope="col">username</th>
+      <th scope="col">email</th>
+      <th scope="col">address</th>
+      <th scope="col">phone</th>
+      <th scope="col">website</th>
+      <th scope="col">company</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"> ${Userinfo.id}</th>
+      <td> ${Userinfo.name}</td>
+      <td> ${Userinfo.username}</td>
+      <td> ${Userinfo.email}</td>
+      <td> ${Userinfo.address.street}</td>
+      <td> ${Userinfo.phone}</td>
+      <td> ${Userinfo.website}</td>
+      <td> ${Userinfo.company.name}</td>
+    </tr>
+    
+  </tbody>
+</table>
+</div>
+
+<div class="row">
+<h3 class="col-md-12 mt-3 mb-3" >View <strong style="color:red"> ${Userinfo.name}</strong> posts</h3>
+<div  class="col-md-6 showPosts mt-3 " id="showPosts"></div>
+<div class="col-md-6 showComments mt-3  " id="showComments"></div>
+<h3 class="col-md-12 mt-3 mb-3" >View <strong style="color:red"> ${Userinfo.name}</strong> Albums</h3>
+<div  class="col-md-6 showAlbums mt-3 " id="showAlbums"></div>
+<div class="col-md-6 showPhotos mt-3  " id="showPhotos"></div>
+<h3 class="col-md-12 mt-3 mb-3" >View <strong style="color:red"> ${Userinfo.name}</strong> Todos</h3>
+<div  class="col-md-6 showTodos mt-3 " id="showTodos"></div>
+</div>
+    
+`
+        };
+
+         
+          
+        };
+        xhttp.send(); 
+      };
+       
+      ShowpostUser = function (id) {
+        
+        const xhttp = new XMLHttpRequest();
+        xhttp.open(
+          "GET",
+          `https://jsonplaceholder.typicode.com/users/${id}/posts`,
+          true
+        );
+
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState === 4 && this.status === 200) {
+            document.getElementById("showPosts").innerHTML ="";
+             var Posts = [];
+            Posts = JSON.parse(xhttp.responseText);
+      
+            Posts.forEach(function (post) {
+              document.getElementById("showPosts").innerHTML += `
+              <div class="table-responsive"> 
+                  
+              <table class="table table-bordered table-striped table-dark">
+  <thead>
+    <tr>
+      <th scope="col">UserId</th>
+      <th scope="col">Id</th>
+      <th scope="col">Title</th>
+      <th scope="col">Body</th>
+      <th scope="col">Comments</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"> ${post.userId}</th>
+      <td> ${post.id}</td>
+      <td> ${post.title}</td>
+      <td> ${post.body}</td>
+      <td><buttom class="btn btn-secondary" onclick="showComments(${post.id})">Comments</buttom></td>
+    </tr>
+    
+  </tbody>
+</table>
+</div>
+  `;
+ });
+          }
+        }
+         
+        };
+       
+        showComments = function (id) {
+        showLoading();
+        const xhttp = new XMLHttpRequest();
+        xhttp.open(
+          "GET",
+          `https://jsonplaceholder.typicode.com/posts/${id}/comments`,
+          true
+        );
+
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState === 4 && this.status === 200) {
+            document.getElementById("showComments").innerHTML="";
+            var PostComments = [];
+            PostComments = JSON.parse(xhttp.responseText);
+            
+            
+            PostComments.forEach(function (comment) {
+             
+              document.getElementById("showComments").innerHTML += `
+              <h3 class="col-md-12 mt-3 mb-3" >View PostId <strong style="color:red"> ${comment.postId}</strong> comments</h3> 
+              <div class="table-responsive"> 
+                     
+              <table class="table table-bordered table-striped table-dark ">
+  <thead>
+    <tr>
+      <th scope="col">PostId</th>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+      <th scope="col">Email</th>
+      <th scope="col">Body</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"> ${comment.postId}</th>
+      <td> ${comment.id}</td>
+      <td> ${comment.name}</td>
+      <td> ${comment.email}</td>
+      <td>${comment.body}</td>
+    </tr>
+    
+  </tbody>
+</table>
+</div>
+                 `;
+            });
+            hideLoading();
+            
+          }
+        };
+      };
+        
+      ShowUseralbums = function (id) {
+        
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("GET", `https://jsonplaceholder.typicode.com/users/${id}/albums`, true);
+
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState === 4 && this.status === 200) {
+            var Userinfo = [];
+            Userinfo = JSON.parse(xhttp.responseText);
+            // document.querySelector(
+            //     ".showAlbums"
+            //   ).innerHTML ="";
+            Userinfo.forEach(function (album) {
+       
+              document.querySelector(
+                ".showAlbums"
+              ).innerHTML += `
+              <div class="table-responsive">
+              <table class="table table-bordered table-striped table-dark">
+  <thead>
+    <tr>
+      <th scope="col">UserId</th>
+      <th scope="col">Id</th>
+      <th scope="col">Title</th>
+      <th scope="col">Photos</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"> ${album.userId}</th>
+      <td> ${album.id}</td>
+      <td> ${album.title}</td>
+      <td><buttom class="btn btn-secondary" onclick="showPhotos(${album.id})">Photos</buttom></td>
+    </tr>
+    
+  </tbody>
+</table>
+</div>
+                          `;
+            });
+           
+          }
+        };
+      };
+      
+      
+       showPhotos = function (id) {
+        showLoading();
+        const xhttp = new XMLHttpRequest();
+        xhttp.open(
+          "GET",
+          `https://jsonplaceholder.typicode.com/albums/${id}/photos`,
+          true
+        );
+
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState === 4 && this.status === 200) {
+            var Albumphoto = [];
+            Albumphoto = JSON.parse(xhttp.responseText);
+            document.getElementById("showPhotos").innerHTML = "";
+            Albumphoto.forEach(function (photo) {
+              document.getElementById(
+                "showPhotos"
+              ).innerHTML += 
+
+              `     <h3 class="col-md-12 mt-3 mb-3" >View AlbumId <strong style="color:red"> ${photo.albumId}</strong> Photos</h3> 
+                 <div class="table-responsive">
+              <table class="table table-bordered table-striped table-dark ">
+  <thead>
+    <tr>
+      <th scope="col">albumId</th>
+      <th scope="col">Id</th>
+      <th scope="col">title</th>
+      <th scope="col">photo</th>
+     
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"> ${photo.albumId}</th>
+      <td> ${photo.id}</td>
+      <td> ${photo.title}</td>
+      <td><img src="${photo.thumbnailUrl}"> </td>
+      
+    </tr>
+    
+  </tbody>
+</table>
+</div>
+                          `;
+            });
+            hideLoading();
+           
+          }
+          
+        };
+      };
+      ShowtodosUser = function (id) { 
+          
+        const xhttp = new XMLHttpRequest();
+        xhttp.open(
+          "GET",
+          `https://jsonplaceholder.typicode.com/users/${id}/todos`,
+          true
+        );
+
+        xhttp.send();
+        xhttp.onreadystatechange = function () {
+          if (this.readyState === 4 && this.status === 200) {
+            var userTodos = [];
+            userTodos = JSON.parse(xhttp.responseText);
+            document.getElementById("showTodos").innerHTML =""; 
+            userTodos.forEach(function (todos) {
+               
+              document.getElementById("showTodos").innerHTML += `
+              <div class="table-responsive">
+              <table class="table table-bordered table-striped table-dark">
+  <thead>
+    <tr>
+      <th scope="col">UserId</th>
+      <th scope="col">Id</th>
+      <th scope="col">Title</th>
+      <th scope="col">Completed</th>
+      
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"> ${todos.userId}</th>
+      <td> ${todos.id}</td>
+      <td> ${todos.title}</td>
+      <td> ${todos.completed}</td>
+       </tr>
+    
+  </tbody>
+</table>
+
+    `;        
+
+            });
+           
+          }
+        }
+         
+        };
+    </script>
+
+     <script src="lib/jQuery/jquery-3.6.0.min.js"></script>
+     <script src="lib/popper/popper.min.js"></script>
+     <script src="lib/bootstrap/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

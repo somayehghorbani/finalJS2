@@ -1,0 +1,41 @@
+* , *::after,*::before{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.hide {
+  display: none !important;  
+}
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.301);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loading div {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 10px solid red;
+  border-bottom-color: transparent;
+  animation: loading 1s infinite linear;
+}
+
+@keyframes loading {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.showPosts,.showComments,.showAlbums,.showPhotos , .showTodos{
+  overflow-y: scroll;
+  height: 500px;
+}
